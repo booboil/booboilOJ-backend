@@ -4,7 +4,7 @@ import com.booboil.oj.common.BaseResponse;
 import com.booboil.oj.common.ErrorCode;
 import com.booboil.oj.common.ResultUtils;
 import com.booboil.oj.exception.BusinessException;
-import com.booboil.oj.model.dto.postthumb.QuestionSubmitAddRequest;
+import com.booboil.oj.model.dto.questionsubmit.QuestionSubmitAddRequest;
 import com.booboil.oj.model.entity.User;
 import com.booboil.oj.service.QuestionSubmitService;
 import com.booboil.oj.service.UserService;
@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/question_submit")
 @Slf4j
+//@Deprecated
 public class QuestionSubmitController {
 
     @Resource
@@ -35,23 +36,21 @@ public class QuestionSubmitController {
     private UserService userService;
 
     /**
-     * 点赞 / 取消点赞
+     * 提交题目
      *
      * @param questionSubmitAddRequest
      * @param request
-     * @return resultNum 本次点赞变化数
+     * @return 提交记录的 id
      */
     @PostMapping("/")
-    public BaseResponse<Integer> doThumb(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
-            HttpServletRequest request) {
-        if (questionSubmitAddRequest == null || questionSubmitAddRequest.getPostId() <= 0) {
+    public BaseResponse<Long> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
+                                               HttpServletRequest request) {
+        if (questionSubmitAddRequest == null || questionSubmitAddRequest.getQuestionId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        // 登录才能点赞
+        // 登录才能提交
         final User loginUser = userService.getLoginUser(request);
-        long postId = questionSubmitAddRequest.getPostId();
-        int result = questionSubmitService.doQuestionSubmit(postId, loginUser);
-        return ResultUtils.success(result);
+        long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
+        return ResultUtils.success(questionSubmitId);
     }
-
 }
