@@ -18,9 +18,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @MapperScan("com.booboil.oj.mapper")
 @EnableScheduling
 @EnableAspectJAutoProxy(proxyTargetClass = true, exposeProxy = true)
-public class MainApplication {
+public class BooboilOJApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MainApplication.class, args);
+        SpringApplication.run(BooboilOJApplication.class, args);
     }
 }

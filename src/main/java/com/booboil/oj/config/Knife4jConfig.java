@@ -26,7 +26,7 @@ public class Knife4jConfig {
     public Docket defaultApi2() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(new ApiInfoBuilder()
-                        .title("接口文档")
+                        .title("BooboilOJ接口文档")
                         .description("booboilOJ-backend")
                         .version("1.0")
                         .build())

@@ -3,10 +3,10 @@
 #
 
 -- 创建库
-create database if not exists my_db;
+create database if not exists booboil_oj;
 
 -- 切换库
-use my_db;
+use booboil_oj;
 
 -- 用户表
 create table if not exists user
