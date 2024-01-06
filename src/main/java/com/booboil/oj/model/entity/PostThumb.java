@@ -14,7 +14,7 @@ import lombok.Data;
  * @author <a href="https://github.com/booboil">程序员booboil</a>
  * 
  */
-@TableName(value = "post_thumb")
+@TableName(value = "question_submit")
 @Data
 public class PostThumb implements Serializable {
 

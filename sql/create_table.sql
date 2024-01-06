@@ -84,7 +84,7 @@ create table if not exists post
 ) comment '帖子' collate = utf8mb4_unicode_ci;
 
 -- 帖子点赞表（硬删除）
-create table if not exists post_thumb
+create table if not exists question_submit
 (
     id         bigint auto_increment comment 'id' primary key,
     postId     bigint                             not null comment '帖子 id',
