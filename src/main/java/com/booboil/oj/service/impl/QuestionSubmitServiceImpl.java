@@ -8,7 +8,7 @@ import com.booboil.oj.service.QuestionSubmitService;
 import org.springframework.stereotype.Service;
 
 /**
-* @author xinrong3.zhang
+* @author booboil
 * @description 针对表【question_submit(题目提交)】的数据库操作Service实现
 * @createDate 2024-01-06 19:38:24
 */
