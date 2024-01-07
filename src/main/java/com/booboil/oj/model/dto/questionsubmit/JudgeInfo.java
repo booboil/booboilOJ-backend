@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * 题目配置
+ * 题目判题信息
  */
 @Data
 public class JudgeInfo {

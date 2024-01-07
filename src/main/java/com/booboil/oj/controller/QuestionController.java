@@ -72,7 +72,7 @@ public class QuestionController {
         }
         JudgeConfig judgeConfig = questionAddRequest.getJudgeConfig();
         if (judgeConfig !=null) {
-            question.setJudgeConfig(JSONUtil.toJsonStr(judgeConfig));
+            question.setJudgeConfig(GSON.toJson(judgeConfig));
         }
         questionService.validQuestion(question, true);
         User loginUser = userService.getLoginUser(request);
@@ -134,7 +134,7 @@ public class QuestionController {
         }
         JudgeConfig judgeConfig = questionUpdateRequest.getJudgeConfig();
         if (judgeConfig !=null) {
-            question.setJudgeConfig(JSONUtil.toJsonStr(judgeConfig));
+            question.setJudgeConfig(GSON.toJson(judgeConfig));
         }
         // 参数校验
         questionService.validQuestion(question, false);
@@ -250,7 +250,7 @@ public class QuestionController {
         }
         JudgeConfig judgeConfig = questionEditRequest.getJudgeConfig();
         if (judgeConfig !=null) {
-            question.setJudgeConfig(JSONUtil.toJsonStr(judgeConfig));
+            question.setJudgeConfig(GSON.toJson(judgeConfig));
         }
         // 参数校验
         questionService.validQuestion(question, false);
