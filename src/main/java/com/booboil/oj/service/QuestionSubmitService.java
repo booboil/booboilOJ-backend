@@ -20,7 +20,7 @@ public interface QuestionSubmitService extends IService<QuestionSubmit> {
      *
      * @param questionSubmitAddRequest 题目提交信息
      * @param loginUser
-     * @return
+     * @return 提交记录的id
      */
     long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, User loginUser);
 
