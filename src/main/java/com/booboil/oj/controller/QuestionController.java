@@ -1,5 +1,7 @@
 package com.booboil.oj.controller;
 
+import cn.hutool.json.JSONUtil;
+import co.elastic.clients.elasticsearch._types.analysis.IcuFoldingTokenFilter;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.booboil.oj.annotation.AuthCheck;
 import com.booboil.oj.common.BaseResponse;
@@ -9,10 +11,8 @@ import com.booboil.oj.common.ResultUtils;
 import com.booboil.oj.constant.UserConstant;
 import com.booboil.oj.exception.BusinessException;
 import com.booboil.oj.exception.ThrowUtils;
-import com.booboil.oj.model.dto.question.QuestionAddRequest;
-import com.booboil.oj.model.dto.question.QuestionEditRequest;
-import com.booboil.oj.model.dto.question.QuestionQueryRequest;
-import com.booboil.oj.model.dto.question.QuestionUpdateRequest;
+import com.booboil.oj.model.dto.question.*;
+import com.booboil.oj.model.dto.user.UserQueryRequest;
 import com.booboil.oj.model.entity.Question;
 import com.booboil.oj.model.entity.User;
 import com.booboil.oj.model.vo.QuestionVO;
@@ -65,6 +65,14 @@ public class QuestionController {
         List<String> tags = questionAddRequest.getTags();
         if (tags != null) {
             question.setTags(GSON.toJson(tags));
+        }
+        List<JudgeCase> judgeCase = questionAddRequest.getJudgeCase();
+        if (judgeCase != null) {
+            question.setJudgeCase(GSON.toJson(judgeCase));
+        }
+        JudgeConfig judgeConfig = questionAddRequest.getJudgeConfig();
+        if (judgeConfig !=null) {
+            question.setJudgeConfig(JSONUtil.toJsonStr(judgeConfig));
         }
         questionService.validQuestion(question, true);
         User loginUser = userService.getLoginUser(request);
@@ -119,6 +127,14 @@ public class QuestionController {
         List<String> tags = questionUpdateRequest.getTags();
         if (tags != null) {
             question.setTags(GSON.toJson(tags));
+        }
+        List<JudgeCase> judgeCase = questionUpdateRequest.getJudgeCase();
+        if (judgeCase != null) {
+            question.setJudgeCase(GSON.toJson(judgeCase));
+        }
+        JudgeConfig judgeConfig = questionUpdateRequest.getJudgeConfig();
+        if (judgeConfig !=null) {
+            question.setJudgeConfig(JSONUtil.toJsonStr(judgeConfig));
         }
         // 参数校验
         questionService.validQuestion(question, false);
@@ -191,7 +207,24 @@ public class QuestionController {
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage, request));
     }
 
-    // endregion
+    /**
+     * 分页获取题目列表（仅管理员）
+     *
+     * @param questionQueryRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/list/page")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Page<Question>> listUserByPage(@RequestBody QuestionQueryRequest questionQueryRequest,
+                                                   HttpServletRequest request) {
+        long current = questionQueryRequest.getCurrent();
+        long size = questionQueryRequest.getPageSize();
+        Page<Question> questionPage = questionService.page(new Page<>(current, size),
+                questionService.getQueryWrapper(questionQueryRequest));
+        return ResultUtils.success(questionPage);
+    }
+
 
     /**
      * 编辑（用户）
@@ -210,6 +243,14 @@ public class QuestionController {
         List<String> tags = questionEditRequest.getTags();
         if (tags != null) {
             question.setTags(GSON.toJson(tags));
+        }
+        List<JudgeCase> judgeCase = questionEditRequest.getJudgeCase();
+        if (judgeCase != null) {
+            question.setJudgeCase(GSON.toJson(judgeCase));
+        }
+        JudgeConfig judgeConfig = questionEditRequest.getJudgeConfig();
+        if (judgeConfig !=null) {
+            question.setJudgeConfig(JSONUtil.toJsonStr(judgeConfig));
         }
         // 参数校验
         questionService.validQuestion(question, false);
