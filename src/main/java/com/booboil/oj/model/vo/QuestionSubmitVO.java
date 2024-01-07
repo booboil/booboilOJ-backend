@@ -1,8 +1,8 @@
 package com.booboil.oj.model.vo;
 
 import cn.hutool.json.JSONUtil;
-import com.booboil.oj.judge.codesandbox.model.JudgeInfo;
 import com.booboil.oj.model.entity.QuestionSubmit;
+import com.booboil.oj.model.dto.questionsubmit.JudgeInfo;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
