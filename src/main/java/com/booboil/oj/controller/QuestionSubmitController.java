@@ -57,25 +57,26 @@ public class QuestionSubmitController {
         long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
         return ResultUtils.success(questionSubmitId);
     }
+
+    /**
+     * 提交题目
+     *
+     * @param questionSubmitAddRequest
+     * @param request
+     * @return 提交记录的 id
+     */
+    @PostMapping("/")
+    public BaseResponse<Long> listQuestionSubmitByPage(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
+                                               HttpServletRequest request) {
+        if (questionSubmitAddRequest == null || questionSubmitAddRequest.getQuestionId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        // 登录才能提交
+        final User loginUser = userService.getLoginUser(request);
+        long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
+        return ResultUtils.success(questionSubmitId);
+    }
 }
-//    /**
-//     * 提交题目
-//     *
-//     * @param questionSubmitAddRequest
-//     * @param request
-//     * @return 提交记录的 id
-//     */
-//    @PostMapping("/")
-//    public BaseResponse<Long> listQuestionSubmitByPage(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
-//                                               HttpServletRequest request) {
-//        if (questionSubmitAddRequest == null || questionSubmitAddRequest.getQuestionId() <= 0) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        // 登录才能提交
-//        final User loginUser = userService.getLoginUser(request);
-//        long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
-//        return ResultUtils.success(questionSubmitId);
-//    }
 //
 //    /**
 //     * 分页获取题目提交列表（除了管理员外，普通用户只能看到非答案、提交代码等公开信息）
