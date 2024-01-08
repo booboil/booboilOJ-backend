@@ -13,7 +13,7 @@ import java.io.Serializable;
  *
  */
 @Data
-//继承父类判断更准确
+// 继承父类判断更准确
 @EqualsAndHashCode(callSuper = true)
 public class QuestionSubmitQueryRequest extends PageRequest implements Serializable {
 
