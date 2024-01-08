@@ -1,5 +1,6 @@
 package com.booboil.oj.service.impl;
 
+import co.elastic.clients.elasticsearch._types.analysis.IcuFoldingTokenFilter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -12,6 +13,7 @@ import com.booboil.oj.model.dto.questionsubmit.QuestionSubmitQueryRequest;
 import com.booboil.oj.model.entity.Question;
 import com.booboil.oj.model.entity.QuestionSubmit;
 import com.booboil.oj.model.entity.User;
+import com.booboil.oj.model.enums.QuestionSubmitLanguageEnum;
 import com.booboil.oj.model.enums.QuestionSubmitStatusEnum;
 import com.booboil.oj.model.vo.QuestionSubmitVO;
 import com.booboil.oj.service.QuestionService;
@@ -25,6 +27,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -55,10 +58,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     public long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, User loginUser) {
         // 校验编程语言是否合法
         String language = questionSubmitAddRequest.getLanguage();
-//        QuestionSubmitLanguageEnum languageEnum = QuestionSubmitLanguageEnum.getEnumByValue(language);
-//        if (languageEnum == null) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR, "编程语言错误");
-//        }
+        QuestionSubmitLanguageEnum languageEnum = QuestionSubmitLanguageEnum.getEnumByValue(language);
+        if (languageEnum == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "编程语言错误");
+        }
         long questionId = questionSubmitAddRequest.getQuestionId();
         // 判断实体是否存在，根据类别获取实体
         Question question = questionService.getById(questionId);
@@ -75,7 +78,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         questionSubmit.setCode(questionSubmitAddRequest.getCode());
         questionSubmit.setLanguage(language);
         // 设置初始状态
-//        questionSubmit.setStatus(QuestionSubmitStatusEnum.WAITING.getValue());
+        questionSubmit.setStatus(QuestionSubmitStatusEnum.WAITING.getValue());
         questionSubmit.setJudgeInfo("{}");
         // 调用save方法执行结果
         boolean save = this.save(questionSubmit);
@@ -112,11 +115,18 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         queryWrapper.eq(ObjectUtils.isNotEmpty(questionId), "questionId", questionId);
         queryWrapper.eq(QuestionSubmitStatusEnum.getEnumByValue(status) != null, "status", status);
         queryWrapper.eq("isDelete", false);
+        // SqlUtils工具类 校验排序字段是否合法（防止 SQL 注入）
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
         return queryWrapper;
     }
 
+    /**
+     * 获取题目提交封装
+     * @param questionSubmit
+     * @param loginUser
+     * @return
+     */
     @Override
     public QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit, User loginUser) {
         QuestionSubmitVO questionSubmitVO = QuestionSubmitVO.objToVo(questionSubmit);
@@ -129,16 +139,31 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         return questionSubmitVO;
     }
 
+    /**
+     * 分页获取题目提交封装
+     * @param questionSubmitPage
+     * @param loginUser
+     * @return
+     */
     @Override
     public Page<QuestionSubmitVO> getQuestionSubmitVOPage(Page<QuestionSubmit> questionSubmitPage, User loginUser) {
+        // 获取题目提交记录列表
         List<QuestionSubmit> questionSubmitList = questionSubmitPage.getRecords();
-        Page<QuestionSubmitVO> questionSubmitVOPage = new Page<>(questionSubmitPage.getCurrent(), questionSubmitPage.getSize(), questionSubmitPage.getTotal());
+        Page<QuestionSubmitVO> questionSubmitVOPage = new Page<>(questionSubmitPage.getCurrent(),
+                                                                 questionSubmitPage.getSize(),
+                                                                 questionSubmitPage.getTotal());
         if (CollectionUtils.isEmpty(questionSubmitList)) {
             return questionSubmitVOPage;
         }
-        List<QuestionSubmitVO> questionSubmitVOList = questionSubmitList.stream()
-                .map(questionSubmit -> getQuestionSubmitVO(questionSubmit, loginUser))
-                .collect(Collectors.toList());
+        // 方式一
+//        List<QuestionSubmitVO> questionSubmitVOList = questionSubmitList.stream()
+//                .map(questionSubmit -> getQuestionSubmitVO(questionSubmit, loginUser))
+//                .collect(Collectors.toList());
+        // 方式二
+        ArrayList<QuestionSubmitVO> questionSubmitVOList = new ArrayList<>();
+        for (QuestionSubmit questionSubmit : questionSubmitList) {
+            questionSubmitVOList.add(getQuestionSubmitVO(questionSubmit, loginUser));
+        }
         questionSubmitVOPage.setRecords(questionSubmitVOList);
         return questionSubmitVOPage;
     }
