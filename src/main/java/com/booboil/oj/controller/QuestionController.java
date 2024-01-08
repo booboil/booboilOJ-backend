@@ -1,7 +1,5 @@
 package com.booboil.oj.controller;
 
-import cn.hutool.json.JSONUtil;
-import co.elastic.clients.elasticsearch._types.analysis.IcuFoldingTokenFilter;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.booboil.oj.annotation.AuthCheck;
 import com.booboil.oj.common.BaseResponse;
@@ -12,7 +10,6 @@ import com.booboil.oj.constant.UserConstant;
 import com.booboil.oj.exception.BusinessException;
 import com.booboil.oj.exception.ThrowUtils;
 import com.booboil.oj.model.dto.question.*;
-import com.booboil.oj.model.dto.user.UserQueryRequest;
 import com.booboil.oj.model.entity.Question;
 import com.booboil.oj.model.entity.User;
 import com.booboil.oj.model.vo.QuestionVO;
@@ -20,6 +17,7 @@ import com.booboil.oj.service.QuestionService;
 import com.booboil.oj.service.UserService;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +44,6 @@ public class QuestionController {
 
     private final static Gson GSON = new Gson();
 
-    // region 增删改查
 
     /**
      * 创建
@@ -62,6 +59,7 @@ public class QuestionController {
         }
         Question question = new Question();
         BeanUtils.copyProperties(questionAddRequest, question);
+
         List<String> tags = questionAddRequest.getTags();
         if (tags != null) {
             question.setTags(GSON.toJson(tags));
@@ -74,6 +72,7 @@ public class QuestionController {
         if (judgeConfig !=null) {
             question.setJudgeConfig(GSON.toJson(judgeConfig));
         }
+        //参数校验
         questionService.validQuestion(question, true);
         User loginUser = userService.getLoginUser(request);
         question.setUserId(loginUser.getId());
@@ -99,7 +98,7 @@ public class QuestionController {
         }
         User user = userService.getLoginUser(request);
         long id = deleteRequest.getId();
-        // 判断是否存在
+        // 判断是否存在 (根据id查询)
         Question oldQuestion = questionService.getById(id);
         ThrowUtils.throwIf(oldQuestion == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可删除
@@ -124,6 +123,7 @@ public class QuestionController {
         }
         Question question = new Question();
         BeanUtils.copyProperties(questionUpdateRequest, question);
+
         List<String> tags = questionUpdateRequest.getTags();
         if (tags != null) {
             question.setTags(GSON.toJson(tags));
@@ -147,7 +147,7 @@ public class QuestionController {
     }
 
     /**
-     * 根据 id 获取
+     * 根据 id 获取题目
      *
      * @param id
      * @return
@@ -198,6 +198,7 @@ public class QuestionController {
         }
         User loginUser = userService.getLoginUser(request);
         questionQueryRequest.setUserId(loginUser.getId());
+
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
         // 限制爬虫
@@ -225,7 +226,6 @@ public class QuestionController {
         return ResultUtils.success(questionPage);
     }
 
-
     /**
      * 编辑（用户）
      *
@@ -240,6 +240,7 @@ public class QuestionController {
         }
         Question question = new Question();
         BeanUtils.copyProperties(questionEditRequest, question);
+
         List<String> tags = questionEditRequest.getTags();
         if (tags != null) {
             question.setTags(GSON.toJson(tags));

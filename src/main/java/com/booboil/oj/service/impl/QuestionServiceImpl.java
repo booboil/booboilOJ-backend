@@ -109,6 +109,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         queryWrapper.like(StringUtils.isNotBlank(content), "content", content);
         queryWrapper.like(StringUtils.isNotBlank(answer), "content", answer);
         if (CollectionUtils.isNotEmpty(tags)) {
+            // tag每一项单独查询
             for (String tag : tags) {
                 queryWrapper.like("tags", "\"" + tag + "\"");
             }
@@ -136,6 +137,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         if (userId != null && userId > 0) {
             user = userService.getById(userId);
         }
+        // 用户脱敏
         UserVO userVO = userService.getUserVO(user);
         questionVO.setUserVO(userVO);
         return questionVO;

@@ -83,7 +83,7 @@ public class QuestionVO implements Serializable {
 
 
     /**
-     * 包装类转对象
+     * 包装类转对象 （JSONUtil.toJsonStr）
      *
      * @param questionVO
      * @return
@@ -94,6 +94,7 @@ public class QuestionVO implements Serializable {
         }
         Question question = new Question();
         BeanUtils.copyProperties(questionVO, question);
+
         List<String> tagList = questionVO.getTags();
         if (tagList != null) {
             question.setTags(JSONUtil.toJsonStr(tagList));
@@ -117,6 +118,7 @@ public class QuestionVO implements Serializable {
         }
         QuestionVO questionVO = new QuestionVO();
         BeanUtils.copyProperties(question, questionVO);
+
         List<String> tagList = JSONUtil.toList(question.getTags(), String.class);
         questionVO.setTags(tagList);
         String judgeConfigStr = question.getJudgeConfig();
