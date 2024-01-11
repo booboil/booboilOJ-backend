@@ -5,7 +5,7 @@ import com.booboil.oj.model.entity.QuestionSubmit;
 /**
  * 判题服务
  */
-public interface JudegeService {
+public interface JudgeService {
 
     /**
      * 判题服务

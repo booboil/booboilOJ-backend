@@ -1,5 +1,4 @@
 package com.booboil.oj.judge;
-import com.booboil.oj.judge.strategy.JudgeStrategy;
 
 import cn.hutool.json.JSONUtil;
 import com.booboil.oj.common.ErrorCode;
@@ -10,7 +9,6 @@ import com.booboil.oj.judge.codesandbox.CodeSandboxProxy;
 import com.booboil.oj.judge.codesandbox.model.ExecuteCodeRequest;
 import com.booboil.oj.judge.codesandbox.model.ExecuteCodeResponse;
 import com.booboil.oj.judge.codesandbox.model.JudgeInfo;
-import com.booboil.oj.judge.strategy.DefaultJudgeStrategy;
 import com.booboil.oj.judge.strategy.JudgeContext;
 import com.booboil.oj.model.dto.question.JudgeCase;
 import com.booboil.oj.model.entity.Question;
@@ -26,7 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class JudgeServiceImpl implements JudegeService{
+public class JudgeServiceImpl implements JudgeService {
 
     @Resource
     private QuestionService questionService;

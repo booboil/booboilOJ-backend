@@ -18,6 +18,7 @@ import com.booboil.oj.model.vo.QuestionSubmitVO;
 import com.booboil.oj.service.QuestionService;
 import com.booboil.oj.service.QuestionSubmitService;
 import com.booboil.oj.service.UserService;
+import com.booboil.oj.judge.JudgeService;
 import com.booboil.oj.utils.SqlUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 
 /**
@@ -43,6 +45,9 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private JudgeService judgeService;
 
     /**
      * 提交题目
@@ -83,7 +88,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "数据插入失败");
         }
         Long questionSubmitId = questionSubmit.getId();
-
+        // 执行判题服务
+        CompletableFuture.runAsync(() -> {
+            judgeService.doJudge(questionSubmitId);
+        });
         return questionSubmitId;
     }
 
