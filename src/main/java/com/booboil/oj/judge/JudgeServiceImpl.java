@@ -1,4 +1,6 @@
 package com.booboil.oj.judge;
+import com.booboil.oj.judge.strategy.JudgeStrategy;
+import com.google.common.collect.Lists;
 
 import cn.hutool.json.JSONUtil;
 import com.booboil.oj.common.ErrorCode;
@@ -9,6 +11,8 @@ import com.booboil.oj.judge.codesandbox.CodeSandboxProxy;
 import com.booboil.oj.judge.codesandbox.model.ExecuteCodeRequest;
 import com.booboil.oj.judge.codesandbox.model.ExecuteCodeResponse;
 import com.booboil.oj.judge.codesandbox.model.JudgeInfo;
+import com.booboil.oj.judge.strategy.DefaultJudgeStrategy;
+import com.booboil.oj.judge.strategy.JudgeContext;
 import com.booboil.oj.model.dto.question.JudgeCase;
 import com.booboil.oj.model.dto.question.JudgeConfig;
 import com.booboil.oj.model.entity.Question;
@@ -35,6 +39,9 @@ public class JudgeServiceImpl implements JudegeService{
 
     @Value("${codesandbox.type:example}")
     private String type;
+
+    @Resource
+    private JudgeStrategy judgeStrategy;
 
     /**
      * 判题服务
@@ -83,43 +90,25 @@ public class JudgeServiceImpl implements JudegeService{
                 .build();
         ExecuteCodeResponse executeCodeResponse = codeSandbox.executeCode(executeCodeRequest);
         List<String> outputList = executeCodeResponse.getOutputList();
-        // 5.根据代码沙箱的执行结果，设置题目的判题状态和信息
-        JudgeInfoMessageEnum judgeInfoMessageEnum = JudgeInfoMessageEnum.WAITING;
-        // 判断逻辑
-        // (1)先判断代码沙箱执行的结果输出数量是否和预期输出数量相等
-        if (outputList.size() != inputList.size()) {
-            judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
-            return null;
+        // 5.根据代码沙箱的执行结果，设置题目的判题状态和信息 (判题策略)
+        JudgeContext judgeContext = new JudgeContext();
+        judgeContext.setJudgeInfo(executeCodeResponse.getJudgeInfo());
+        judgeContext.setInputList(inputList);
+        judgeContext.setOutputList(outputList);
+        judgeContext.setJudgeCaseList(judgeCaseList);
+        judgeContext.setQuestion(question);
+        DefaultJudgeStrategy defaultJudgeStrategy = new DefaultJudgeStrategy();
+        JudgeInfo judgeInfo = judgeStrategy.doJudge(judgeContext);
+        // 6.修改数据库中的判题结果
+        questionSubmitUpdate = new QuestionSubmit();
+        questionSubmitUpdate.setId(questionSubmitId);
+        questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCEND.getValue());
+        questionSubmitUpdate.setJudgeInfo(JSONUtil.toJsonStr(judgeInfo));
+        update = questionSubmitService.updateById(questionSubmitUpdate);
+        if (!update) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"题目状态更新错误");
         }
-        // (2)依次判断每一项输出和预期输出是否相等
-        for (int i = 0; i < judgeCaseList.size(); i++) {
-            JudgeCase judgeCase = judgeCaseList.get(i);
-            if (!judgeCase.getOutput().equals(outputList.get(i))) {
-                judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
-                return null;
-            }
-        }
-
-        // (3)判题题目的现在是否符合要求
-        // 获取判题信息
-        JudgeInfo judgeInfo = executeCodeResponse.getJudgeInfo();
-        Long memory = judgeInfo.getMemory();
-        Long time = judgeInfo.getTime();
-        // 获取判题配置(限制)
-        String judgeConfigStr = question.getJudgeConfig();
-        JudgeConfig judgeConfig = JSONUtil.toBean(judgeConfigStr, JudgeConfig.class);
-        Long needTimeLimit = judgeConfig.getTimeLimit();
-        Long needMemoryLimit = judgeConfig.getMemoryLimit();
-        Long needStackLimit = judgeConfig.getStackLimit();
-        if (memory > needMemoryLimit) {
-            judgeInfoMessageEnum = JudgeInfoMessageEnum.MEMORY_LIMIT_EXCEEDED;
-            return null;
-        }
-        if (time >needTimeLimit) {
-            judgeInfoMessageEnum = JudgeInfoMessageEnum.TIME_LIMIT_EXCEEDED;
-            return null;
-        }
-        
-        return null;
+        QuestionSubmit questionSubmitResult = questionSubmitService.getById(questionId);
+        return questionSubmitResult;
     }
 }
