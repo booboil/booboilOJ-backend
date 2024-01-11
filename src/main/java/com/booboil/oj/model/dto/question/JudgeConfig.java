@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * 题目配置
+ * 判题配置 （限制）
  */
 @Data
 public class JudgeConfig {

@@ -1,7 +1,6 @@
 package com.booboil.oj.judge;
 
-import com.booboil.oj.judge.codesandbox.model.ExecuteCodeRequest;
-import com.booboil.oj.judge.codesandbox.model.ExecuteCodeResponse;
+import com.booboil.oj.model.entity.QuestionSubmit;
 
 /**
  * 判题服务
@@ -13,5 +12,5 @@ public interface JudegeService {
      * @param questionSubmitId
      * @return
      */
-    ExecuteCodeResponse doJudge(long questionSubmitId);
+    QuestionSubmit doJudge(long questionSubmitId);
 }
