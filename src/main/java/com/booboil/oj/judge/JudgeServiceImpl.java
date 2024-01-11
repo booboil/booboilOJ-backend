@@ -1,6 +1,5 @@
 package com.booboil.oj.judge;
 import com.booboil.oj.judge.strategy.JudgeStrategy;
-import com.google.common.collect.Lists;
 
 import cn.hutool.json.JSONUtil;
 import com.booboil.oj.common.ErrorCode;
@@ -14,10 +13,8 @@ import com.booboil.oj.judge.codesandbox.model.JudgeInfo;
 import com.booboil.oj.judge.strategy.DefaultJudgeStrategy;
 import com.booboil.oj.judge.strategy.JudgeContext;
 import com.booboil.oj.model.dto.question.JudgeCase;
-import com.booboil.oj.model.dto.question.JudgeConfig;
 import com.booboil.oj.model.entity.Question;
 import com.booboil.oj.model.entity.QuestionSubmit;
-import com.booboil.oj.model.enums.JudgeInfoMessageEnum;
 import com.booboil.oj.model.enums.QuestionSubmitStatusEnum;
 import com.booboil.oj.service.QuestionService;
 import com.booboil.oj.service.QuestionSubmitService;
@@ -37,11 +34,11 @@ public class JudgeServiceImpl implements JudegeService{
     @Resource
     private QuestionSubmitService questionSubmitService;
 
+    @Resource
+    private JudgeManager judgeManager;
+
     @Value("${codesandbox.type:example}")
     private String type;
-
-    @Resource
-    private JudgeStrategy judgeStrategy;
 
     /**
      * 判题服务
@@ -97,8 +94,8 @@ public class JudgeServiceImpl implements JudegeService{
         judgeContext.setOutputList(outputList);
         judgeContext.setJudgeCaseList(judgeCaseList);
         judgeContext.setQuestion(question);
-        DefaultJudgeStrategy defaultJudgeStrategy = new DefaultJudgeStrategy();
-        JudgeInfo judgeInfo = judgeStrategy.doJudge(judgeContext);
+        judgeContext.setQuestionSubmit(questionSubmit);
+        JudgeInfo judgeInfo = judgeManager.doJudge(judgeContext);
         // 6.修改数据库中的判题结果
         questionSubmitUpdate = new QuestionSubmit();
         questionSubmitUpdate.setId(questionSubmitId);
