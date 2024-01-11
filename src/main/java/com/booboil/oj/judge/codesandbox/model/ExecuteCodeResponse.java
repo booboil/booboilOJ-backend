@@ -1,6 +1,5 @@
 package com.booboil.oj.judge.codesandbox.model;
 
-import com.booboil.oj.model.dto.questionsubmit.JudgeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 public class ExecuteCodeResponse {
 
+    /**
+     * 题目输出用例
+     */
     private List<String> outputList;
 
     /**
