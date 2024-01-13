@@ -23,6 +23,7 @@ import com.booboil.oj.utils.SqlUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -47,6 +48,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     private UserService userService;
 
     @Resource
+    @Lazy
     private JudgeService judgeService;
 
     /**
@@ -88,7 +90,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "数据插入失败");
         }
         Long questionSubmitId = questionSubmit.getId();
-        // 执行判题服务
+        // 执行判题服务 (异步操作)
         CompletableFuture.runAsync(() -> {
             judgeService.doJudge(questionSubmitId);
         });
