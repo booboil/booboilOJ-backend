@@ -24,3 +24,4 @@ public class BooboilOJApplication {
         SpringApplication.run(BooboilOJApplication.class, args);
     }
 }
+
