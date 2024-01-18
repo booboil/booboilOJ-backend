@@ -314,7 +314,6 @@ public class QuestionController {
         final User loginUser = userService.getLoginUser(request);
         long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
         return ResultUtils.success(questionSubmitId);
-
     }
 
     /**
