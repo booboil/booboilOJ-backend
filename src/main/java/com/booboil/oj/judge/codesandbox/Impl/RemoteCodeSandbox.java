@@ -14,9 +14,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class RemoteCodeSandbox implements CodeSandbox {
 
-    // 定义鉴权请求头和密钥
+    // 定义鉴权请求头
     private static final String AUTH_REQUEST_HEADER = "auth";
-
+    // 校验密钥
     private static final String AUTH_REQUEST_SECRET = "secretKey";
 
     @Override
@@ -29,11 +29,9 @@ public class RemoteCodeSandbox implements CodeSandbox {
                 .body(json)
                 .execute()
                 .body();
-
         if (StringUtils.isBlank(responseStr)) {
-            throw new BusinessException(ErrorCode.API_REQUEST_ERROR,
-                    "executeCode remoteSandbox error, message =" + responseStr);
+            throw new BusinessException(ErrorCode.API_REQUEST_ERROR, "executeCode remoteSandbox error, message = " + responseStr);
         }
-        return JSONUtil.toBean(responseStr,ExecuteCodeResponse.class);
+        return JSONUtil.toBean(responseStr, ExecuteCodeResponse.class);
     }
 }
