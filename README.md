@@ -13,3 +13,5 @@
 管理题目
 ![image](https://github.com/booboil/booboilOJ-backend/assets/99343075/27db47d8-637e-453d-bf13-11b1dbeda206)
 
+以下是采用Spring Cloud微服务改造后的代码地址：
+https://github.com/booboil/booboilOJ-backend-microservice
